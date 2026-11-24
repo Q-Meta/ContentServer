@@ -1,0 +1,1 @@
+function s(e){return`let specGloss=textureSample(specGlossTexture,specGlossSampler,${e});var roughness=clamp(1.0-specGloss.a,0.0,1.0);var metallic=0.0;`}var l="var colorF0=specGloss.rgb;let colorF90=vec3<f32>(1.0);let maxSpecular=max(colorF0.r,max(colorF0.g,colorF0.b));var surfaceAlbedo=baseColor*(1.0-maxSpecular);";export{l as SPEC_GLOSS_F0,s as specGlossRoughness};
