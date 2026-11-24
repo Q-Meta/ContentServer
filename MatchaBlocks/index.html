@@ -2,16 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Matcha Blocks — Babylon Lite (WebGPU)</title>
-    <script type="module" crossorigin src="./assets/index-COzikNZI.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-fF4X7bKM.css">
+    <script type="module" crossorigin src="./assets/index-C7KYHtbd.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-sXIEJnW3.css">
   </head>
   <body>
     <canvas id="renderCanvas"></canvas>
 
     <div id="hud">
       <div id="floatLayer" class="float-layer" aria-hidden="true"></div>
+      <div id="gestureLayer" class="gesture-layer" aria-hidden="true"></div>
 
       <div class="top-bar">
         <div class="card target-card">
@@ -90,6 +91,10 @@
           <span><b>← / → / ↓</b> Grab / Throw</span>
           <span><b>Space</b> Grab / Drop</span>
           <span><b>R</b> Restart</span>
+        </div>
+        <div class="gesture-hint">
+          <span><b>TAP L/R</b> Move (Hold = Run)</span>
+          <span><b>SWIPE ←/→/↓</b> Grab / Throw</span>
         </div>
         <div class="touch-pad" aria-label="Touch controls">
           <button data-act="moveLeft">◀</button>
