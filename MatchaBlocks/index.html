@@ -3,14 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>Matcha Blocks — Babylon Lite (WebGPU)</title>
-    <script type="module" crossorigin src="./assets/index-C7KYHtbd.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-sXIEJnW3.css">
+    <meta name="theme-color" content="#4f4641" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <title>Matcha Blocks</title>
+    <script type="module" crossorigin src="./assets/index-DJdn5y2G.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BBbHbr4a.css">
   </head>
   <body>
     <canvas id="renderCanvas"></canvas>
 
     <div id="hud">
+      <div id="dangerVignette" class="danger-vignette" aria-hidden="true"></div>
       <div id="floatLayer" class="float-layer" aria-hidden="true"></div>
       <div id="gestureLayer" class="gesture-layer" aria-hidden="true"></div>
 
@@ -40,13 +46,18 @@
           </div>
           <div class="controls-row">
             <button id="restartBtn" title="Restart (R)">Restart</button>
+            <button id="undoBtn" title="Undo (Z)" disabled>↶</button>
+            <button id="hintBtn" title="Hint (H)">💡</button>
             <button id="guideBtn" title="Interactive tutorial">?</button>
+          </div>
+          <div class="controls-row">
             <button id="bgmBtn" class="active" title="Toggle 8-bit BGM (B)">♪</button>
             <button id="muteBtn" title="Toggle sound (M)">🔊</button>
+            <button id="langBtn" title="Switch language (ZH / EN)">中</button>
           </div>
           <div class="controls-row">
             <label class="theme-wrap">
-              <span class="label">MODE</span>
+              <span class="label" id="modeLabel">MODE</span>
               <select id="modeSelect">
                 <option value="endless">Endless</option>
                 <option value="chase">Chase</option>
@@ -57,7 +68,7 @@
           </div>
           <div class="controls-row">
             <label class="theme-wrap">
-              <span class="label">THEME</span>
+              <span class="label" id="themeLabel">THEME</span>
               <select id="themeSelect"></select>
             </label>
           </div>
@@ -67,9 +78,12 @@
       <div id="modeBar" class="mode-bar hidden" role="status" aria-live="polite">
         <div class="mode-head">
           <span id="modeTitle" class="mode-title">DAILY CHALLENGE</span>
-          <div id="modeNav" class="mode-nav hidden">
-            <button id="prevPuzzleBtn" title="Previous puzzle">◀</button>
-            <button id="nextPuzzleBtn" title="Next puzzle">▶</button>
+          <div class="mode-head-actions">
+            <button id="shareBtn" class="hidden" title="Share">SHARE</button>
+            <div id="modeNav" class="mode-nav hidden">
+              <button id="prevPuzzleBtn" title="Previous puzzle">◀</button>
+              <button id="nextPuzzleBtn" title="Next puzzle">▶</button>
+            </div>
           </div>
         </div>
         <div id="modeSub" class="mode-sub">GOAL 1/3 · THROWS 0</div>
@@ -86,22 +100,27 @@
       <div id="toast" class="toast hidden"></div>
 
       <div class="bottom-bar">
-        <div class="hint">
+        <div class="hint" id="desktopHint">
           <span><b>A / D</b> Move</span>
           <span><b>← / → / ↓</b> Grab / Throw</span>
-          <span><b>Space</b> Grab / Drop</span>
+          <span><b>Z / H</b> Undo / Hint</span>
           <span><b>R</b> Restart</span>
         </div>
-        <div class="gesture-hint">
-          <span><b>TAP L/R</b> Move (Hold = Run)</span>
-          <span><b>SWIPE ←/→/↓</b> Grab / Throw</span>
+        <div class="gesture-hint" id="gestureHint">
+          <span id="gestureHintText"><b>TAP L/R</b> Move (Hold = Run) · <b>SWIPE ←/→/↓</b> Grab / Throw</span>
+          <button id="flipPadBtn" class="mini-pad-btn" title="Flip Left/Right handedness">⇄</button>
+          <button id="hidePadBtn" class="mini-pad-btn" title="Hide/Show touch buttons">⌨</button>
         </div>
-        <div class="touch-pad" aria-label="Touch controls">
-          <button data-act="moveLeft">◀</button>
-          <button data-act="moveRight">▶</button>
-          <button data-act="grabLeft">GRAB L</button>
-          <button data-act="grabDown">GRAB</button>
-          <button data-act="grabRight">GRAB R</button>
+        <div class="touch-pad" id="touchPad" aria-label="Touch controls">
+          <div class="pad-group pad-move">
+            <button data-act="moveLeft">◀</button>
+            <button data-act="moveRight">▶</button>
+          </div>
+          <div class="pad-group pad-act">
+            <button data-act="grabLeft">GRAB L</button>
+            <button data-act="grabDown">GRAB</button>
+            <button data-act="grabRight">GRAB R</button>
+          </div>
         </div>
       </div>
     </div>
@@ -110,7 +129,7 @@
       <div class="dex-panel">
         <div class="dex-header">
           <div>
-            <div class="dex-title">MATCHA DEX · 126 SHAPES</div>
+            <div class="dex-title" id="dexTitle">MATCHA DEX · 126 SHAPES</div>
             <div id="dexProgressText" class="dex-sub">UNLOCKED 0 / 126 (0%) · Click any shape to set as target</div>
           </div>
           <button id="closeDexBtn" title="Close (Esc)">✕</button>
@@ -122,6 +141,13 @@
           <button class="dex-filter active" data-dex-filter="all">ALL (126)</button>
           <button class="dex-filter" data-dex-filter="unlocked">UNLOCKED</button>
           <button class="dex-filter" data-dex-filter="locked">LOCKED</button>
+        </div>
+        <div id="dexDetailBar" class="dex-detail-bar">
+          <span id="dexDetailInfo">#001 · Cleared 0×</span>
+          <div class="dex-detail-actions">
+            <button id="dexSetTargetBtn">Set Target</button>
+            <button id="dexPracticeBtn" class="active">Practice</button>
+          </div>
         </div>
         <div id="dexGrid" class="dex-grid"></div>
       </div>

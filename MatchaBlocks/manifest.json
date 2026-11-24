@@ -1,0 +1,19 @@
+{
+  "name": "Matcha Blocks",
+  "short_name": "MatchaBlocks",
+  "description": "Pixel-art match-3 puzzle platformer with 126 Matcha shapes, Daily Challenge, and Puzzles.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#4f4641",
+  "theme_color": "#4f4641",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
